@@ -82,7 +82,7 @@ const AddPatientPage = () => {
             const res = await api.post('/patient', data);
             if (res.status === 201) {
                 alert('بیمار با موفقیت ایجاد شد');
-                router.push('/patients');
+                router.push('/dashboard/clinic/patients');
             }
         } catch (error) {
             console.error('Error adding patient:', error);

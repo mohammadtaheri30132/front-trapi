@@ -60,7 +60,7 @@ const TherapistsClinicPage = () => {
     };
 
     // حذف تراپیست
-    const handleDeleteTherapist = async (therapistId:≈) => {
+    const handleDeleteTherapist = async (therapistId) => {
         try {
             await api.delete(`/therapists/delete/${therapistId}`, {
                 headers: {Authorization: `Bearer ${localStorage.getItem('token')}`},

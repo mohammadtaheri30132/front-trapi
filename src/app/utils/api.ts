@@ -4,7 +4,7 @@ import Cookies from 'js-cookie';
 
 // آدرس پایه سرور
 // const API_BASE_URL = 'http://185.208.172.201/api';
-const API_BASE_URL = 'http://localhost:4000/api';
+const API_BASE_URL = 'http://193.242.208.20/back/api';
 
 // تنظیمات axios
 const api = axios.create({
