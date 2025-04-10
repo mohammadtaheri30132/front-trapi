@@ -2,7 +2,6 @@ import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
   /* config options here */
-  output: "export",
   typescript: {
     ignoreBuildErrors: true, // نادیده گرفتن خطاهای TypeScript در زمان بیلد
 },

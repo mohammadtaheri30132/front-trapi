@@ -7,39 +7,47 @@ interface TextProcessorModalProps {
   setBook: React.Dispatch<React.SetStateAction<Record<string, string>>>;
 }
 
-const TextProcessorModal: React.FC<TextProcessorModalProps> = ({ open, setOpen, setBook }) => {
+const TextProcessorModal: React.FC<TextProcessorModalProps> = ({ open,book, setOpen, setBook }) => {
   const [text, setText] = useState("");
-
-  const extractFields = (inputText: string) => {
-    const fieldNames = [
-      "who_should_read",
-      "book_review",
-      "about_the_book",
-      "desc_book",
-      "short_desc",
-      "name",
-    ];
-
-    const extractedData: Record<string, string> = {};
-
-    fieldNames.forEach((field) => {
-      console.log("field", field)
-      const regex = new RegExp(`const ${field} = ['"](.*?)['"];`, "s");
-      const match = inputText.match(regex);
-      console.log('match',match)
-      if (match) {
-        extractedData[field] = match[1];
+  function processBookData(bookObj) {
+    // پردازش فیلد mins
+    if (!bookObj.mins) {
+      bookObj.mins = '15';
+    } else {
+      // استخراج فقط اعداد از رشته
+      bookObj.mins = bookObj.mins.replace(/\D/g, '');
+      // اگر پس از حذف غیراعداد، رشته خالی شد، مقدار پیشفرض قرار دهید
+      if (bookObj.mins === '') {
+        bookObj.mins = '15';
       }
-    });
+    }
+  
+    // پردازش فیلد ratings
+    if (!bookObj.ratings) {
+      bookObj.ratings = '4.6';
+    } else {
+      // حذف پرانتز و محتوای داخل آن
+      bookObj.ratings = bookObj.ratings.replace(/\(.*\)/g, '').trim();
+      // حذف فاصله‌های اضافی
+      bookObj.ratings = bookObj.ratings.trim();
+    }
+  
+    return bookObj;
+  }
+  
 
-    return extractedData;
-  };
+  function extractBookData() {
+    const func = new Function(text + '\n' + 'return info'); // ساخت یک تابع از کد ورودی
+    const result = func(); // اجرای تابع و دریافت مقدار بازگشتی
+    return result
+  }
+
 
   const handleProcessText = () => {
-    console.log(' console.log(extractedValues)',)
-    const extractedValues = extractFields(text);
-    console.log(extractedValues)
-    setBook((p) => ({ ...p, ...extractedValues }));
+
+    const info =extractBookData()
+    const processedBook = processBookData({mins:book?.mins,ratings:book?.ratings});
+    setBook((p) => ({ ...p, ...info,...processedBook }));
     setOpen(false); // بستن مدال
   };
 
