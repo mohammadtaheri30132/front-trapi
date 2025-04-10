@@ -44,7 +44,7 @@ const EditBookPage = () => {
     useEffect(() => {
         const fetchBook = async () => {
             if (slug) {
-                const response = await fetch(`http://localhost:2323/api/books/${slug}`);
+                const response = await fetch(`http://localhost:2424/api/books/${slug}`);
                 const data = await response.json();
                 setBook(data);
        
@@ -112,9 +112,9 @@ const EditBookPage = () => {
     useEffect(() => {
         const fetchData = async () => {
             const [categoriesRes, topicsRes, authorsRes] = await Promise.all([
-                fetch('http://localhost:2323/api/categories'),
-                fetch('http://localhost:2323/api/topics'),
-                fetch('http://localhost:2323/api/authors')
+                fetch('http://localhost:2424/api/categories'),
+                fetch('http://localhost:2424/api/topics'),
+                fetch('http://localhost:2424/api/authors')
             ]);
             setCategories(await categoriesRes.json());
             setTopics(await topicsRes.json());
@@ -150,7 +150,7 @@ const EditBookPage = () => {
     const handleSubmit = async (e) => {
         e.preventDefault();
         try {
-            const response = await fetch(`http://localhost:2323/api/books/${slug}`, {
+            const response = await fetch(`http://localhost:2424/api/books/${slug}`, {
                 method: 'PUT',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(book),

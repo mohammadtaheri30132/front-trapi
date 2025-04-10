@@ -15,7 +15,7 @@ const BooksTable = () => {
         // دریافت لیست کتاب‌ها از API
         const fetchBooks = async () => {
             try {
-                const response = await fetch('http://localhost:2323/api/books');
+                const response = await fetch('http://localhost:2424/api/books');
                 if (!response.ok) {
                     throw new Error('خطا در دریافت داده‌ها');
                 }

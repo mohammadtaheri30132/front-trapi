@@ -16,7 +16,7 @@ const AddAuthorModal = ({ isOpen, onClose }) => {
   // دریافت لیست نویسندگان
   const fetchAuthors = async () => {
     try {
-      const response = await axios.get("http://localhost:2323/api/authors");
+      const response = await axios.get("http://localhost:2424/api/authors");
       setAuthors(response.data);
     } catch (error) {
       console.error("خطا در دریافت نویسندگان:", error);
@@ -28,7 +28,7 @@ const AddAuthorModal = ({ isOpen, onClose }) => {
     if (!name.trim()) return;
     setLoading(true);
     try {
-      const response = await axios.post("http://localhost:2323/api/authors", { name, bio });
+      const response = await axios.post("http://localhost:2424/api/authors", { name, bio });
       if (response.status === 201) {
         setAuthors([...authors, response.data]);
         setName("");
@@ -45,7 +45,7 @@ const AddAuthorModal = ({ isOpen, onClose }) => {
   const handleDeleteAuthors = async () => {
     setLoading(true);
     try {
-      await Promise.all(selectedAuthors.map(id => axios.delete(`http://localhost:2323/api/authors/${id}`)));
+      await Promise.all(selectedAuthors.map(id => axios.delete(`http://localhost:2424/api/authors/${id}`)));
       setAuthors(authors.filter(author => !selectedAuthors.includes(author._id)));
       setSelectedAuthors([]);
     } catch (error) {
