@@ -556,7 +556,7 @@ const loveMessages = [
       // دریافت داده‌ها از سرور
       useEffect(() => {
           const fetchBook = async () => {
-              const res = await fetch(`http://localhost:2323/api/summaries/book/${id}`);
+              const res = await fetch(`http://193.242.208.20:4000/api/summaries/book/${id}`);
               const data = await res.json();
               if (data.content) {
                   setSummary(data);
@@ -601,7 +601,7 @@ const loveMessages = [
   
       // ذخیره تغییرات در سرور
       const handleSaveSummary = async () => {
-          const response = await fetch(`http://localhost:2323/api/summaries/book/${id}`, {
+          const response = await fetch(`http://193.242.208.20:4000/api/summaries/book/${id}`, {
               method: 'PUT',
               headers: { 'Content-Type': 'application/json' },
               body: JSON.stringify(summary),

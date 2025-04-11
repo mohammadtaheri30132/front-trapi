@@ -88,11 +88,11 @@ const EditBookPage = () => {
         ${book.who_should_read}
         ---------------
        
-        در نهایت یک کد جاوااسکریپت قابل کپی به من بده
+        در نهایت یک ابجکت جاوااسکریپت به نام info قابل کپی به من بده
         که 
 
         باز هم تاکید میکنم
-        در خروجی فقط فایل جاوااسکریپت برایم و نویسندگان کتاب(نام نویسندگان را بعد از فال جاوااسکریپت به صورت متن بگو) مهم است بقیه توضیحات اضافی را نده
+        در خروجی فقط فایل جاوااسکریپت برایم و نویسندگان کتاب(نام نویسندگان و بیوگرافی انها  را بعد از فایل جاوااسکریپت به صورت متن بگو) مهم است بقیه توضیحات اضافی را نده
 
         const name ='ترجمه نام کتاب '
         const short_desc ='ترجمه توضیحات کوتاه '
@@ -195,7 +195,7 @@ const EditBookPage = () => {
     //     };
     // });
 
-    // const headerText = " میخواهم تایتل و متن هر کدام از ابجکت های زیر را برایم به فارسی ترجمه کنی و لحن ان باید محاوره ای باشد جتی اسم کتاب ها و نویسنده نیز باید فارسی یا معادل فارسی اند باشد . در اخر یک فایل جاوا اسکریپت بده که یک ارایه مانند ارایه .توجه داشته باش من در خروجی فقط فایل جاوااسکریپت میخواهم.\n\n";
+    // const headerText = " میخواهم تایتل و متن هر کدام از ابجکت های زیر را برایم به فارسی ترجمه کنی و لحن ان باید محاوره ای باشد جتی اسم کتاب ها و نویسنده نیز باید فارسی یا معادل فارسی اند باشد همچنین هر جایی نیاز بود متن به خط بعدی برود بنویس ENTERBEZAN . در اخر یک فایل جاوا اسکریپت بده که یک ارایه مانند ارایه .توجه داشته باش من در خروجی فقط فایل جاوااسکریپت میخواهم.\n\n";
 
     // const jsonContent = JSON.stringify(texts, null, 2);
 
@@ -213,31 +213,89 @@ const EditBookPage = () => {
 
     // document.body.removeChild(a);
     // `
+    function generateCodeWithSlug() {
+        // استرینگ کد اصلی که می‌خواهیم slug در آن قرار گیرد
+        const codeTemplate = `
+        const targetLink = document.querySelector('a[href="/app/books/${book.slug}"]');
+        const p = targetLink.parentElement;
+    
+        const pages = [...p.children].filter(item => {
+            if (item.tagName === 'DIV') {
+                const testText = item.innerText;
+                return testText;
+            }
+        });
+    
+        const texts = pages.map((item) => {
+            const line = item.innerText;
+            const firstNewline = line.indexOf('\\n'); // اولین \n
+            const secondNewline = line.indexOf('\\n', firstNewline + 1); // دومین \n
+            const thirdNewline = line.indexOf('\\n', secondNewline + 1); // سومین \n
+    
+            const title = line.substring(secondNewline + 1, thirdNewline).trim();
+            const text = line.substring(thirdNewline + 1).trim();
+    
+            return {
+                title: title,
+                text: text
+            };
+        });
+       const headerText = " میخواهم تایتل و متن هر کدام از ابجکت های زیر را برایم به فارسی ترجمه کنی و لحن ان باید محاوره ای باشد جتی اسم کتاب ها و نویسنده نیز باید فارسی یا معادل فارسی اند باشد همچنین هر جایی نیاز بود متن به خط بعدی برود بنویس ENTERBEZAN . در اخر یک فایل جاوا اسکریپت بده که یک ارایه به نام books مانند ارایه .توجه داشته باش من در خروجی فقط فایل جاوااسکریپت میخواهم.";
+
+        const backslashn='   = '
+        const jsonContent  = JSON.stringify(texts, null, 2);
+        const finalContent = headerText +  jsonContent;
+    
+        const blob = new Blob([finalContent], { type: 'text/plain' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = 'texts.txt'; // نام فایل برای دانلود
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        `;
+    
+        // کپی کردن کد به کلیپ‌بورد
+        navigator.clipboard.writeText(codeTemplate)
+            .then(() => {
+                alert("بزن بریم به صفحه کتاب");
+                window.open(`http://blinkist.com/en/reader/books/${book.slug}`, '_blank')
+            })
+            .catch((err) => {
+                console.error("خطا در کپی به کلیپ‌بورد:", err);
+                alert("خطا در کپی کردن کد.");
+            });
+    }
+    
+    
     return (
         <Container maxWidth="md" sx={{ padding: '20px' }}>
             <Typography variant="h4">ویرایش کتاب</Typography>
             
             <Paper elevation={3} sx={{ padding: '20px' }}>
+            <Button sx={{margin:2}} variant="contained" color="primary"
+                    onClick={handleCopy}>کپی کد اطلاعات کتاب</Button>
             <Button variant="contained" sx={{margin:2}} color="primary" onClick={() => setProcessorModal(true)}>
-                پردازش متن
+                پردازش متن اطلاعات کتاب
             </Button>
           
-                <TextProcessorModal open={processorModal} setOpen={setProcessorModal} setBook={setBook} />
+            <Button variant="contained" sx={{margin:2}} color="warning" onClick={generateCodeWithSlug}>
+               کد متن خلاصه کتاب
+            </Button>
 
-                <Button sx={{margin:2}}
+            <Button sx={{margin:2}}
                  onClick={() => window.open(`http://blinkist.com/en/books/${book.slug}`, '_blank')}
                 variant="outlined" color="primary">
                       لینک سایت اصلی کتاب
                 </Button>
-                <Button sx={{margin:2}}
-                 onClick={() => window.open(`http://blinkist.com/en/reader/books/${book.slug}`, '_blank')}
-                variant="outlined" color="primary">
-                      لینک متن کتاب
-                </Button>
-                <Button sx={{margin:2}} variant="contained" color="primary"
+                <TextProcessorModal book={book} open={processorModal} setOpen={setProcessorModal} setBook={setBook} />
+
+           
+               
+                <Button sx={{margin:2}} variant="contained" color="success"
                     onClick={() => setAuthorModal(true)}>افزودن نویسنده</Button>
-                 <Button sx={{margin:2}} variant="contained" color="primary"
-                    onClick={handleCopy}>کپی</Button>
+               
                 <AddAuthorModal
                     isOpen={authorModal}
                     onClose={() => setAuthorModal(false)}
@@ -352,14 +410,14 @@ const EditBookPage = () => {
                         </FormControl>
 
 
-                    <Typography variant="h6">سوالات متداول</Typography>
+                    {/* <Typography variant="h6">سوالات متداول</Typography>
                     {book.faqs.map((faq, index) => (
                         <Box key={index} display="flex" alignItems="center" gap={2}>
                             <TextField fullWidth label="سوال" value={faq.question} onChange={(e) => handleFaqChange(index, 'question', e.target.value)} />
                             <TextField fullWidth label="پاسخ" value={faq.answer} onChange={(e) => handleFaqChange(index, 'answer', e.target.value)} />
                             <IconButton onClick={() => handleRemoveFaq(index)}><DeleteIcon /></IconButton>
                         </Box>
-                    ))}
+                    ))} */}
                     <Button onClick={handleAddFaq} startIcon={<AddIcon />}>افزودن سوال</Button>
                     
                     <Box display="flex" justifyContent="space-between" mt={2}>

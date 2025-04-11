@@ -16,7 +16,7 @@ const CategoriesPage = () => {
     useEffect(() => {
         const fetchCategories = async () => {
             try {
-                const response = await axios.get('http://localhost:2323/api/categories');
+                const response = await axios.get('http://193.242.208.20:4000/api/categories');
                 setCategories(response.data);
             } catch (err) {
                 console.error('خطا در دریافت دسته‌بندی‌ها:', err);
@@ -33,7 +33,7 @@ const CategoriesPage = () => {
 
     const handleEditSave = async (categoryId) => {
         try {
-            const response = await axios.put(`http://localhost:2323/api/categories/${categoryId}`, {
+            const response = await axios.put(`http://193.242.208.20:4000/api/categories/${categoryId}`, {
                 name: editedName,
                 persianName: editedPersianName,
             });
@@ -46,7 +46,7 @@ const CategoriesPage = () => {
 
     const handleDelete = async (categoryId) => {
         try {
-            await axios.delete(`http://localhost:2323/api/categories/${categoryId}`);
+            await axios.delete(`http://193.242.208.20:4000/api/categories/${categoryId}`);
             setCategories(categories.filter(cat => cat._id !== categoryId));
         } catch (err) {
             console.error('خطا در حذف دسته‌بندی:', err);
@@ -55,7 +55,7 @@ const CategoriesPage = () => {
 
     const handleAddTopic = async (categoryId) => {
         try {
-            const response = await axios.post(`http://localhost:2323/api/categories/${categoryId}/topics`, {
+            const response = await axios.post(`http://193.242.208.20:4000/api/categories/${categoryId}/topics`, {
                 name: newTopic,
             });
             setCategories(categories.map((item) => item._id === categoryId ? response.data : item));
@@ -67,7 +67,7 @@ const CategoriesPage = () => {
 
     const handleDeleteTopic = async (categoryId, topicId) => {
         try {
-            const response = await axios.delete(`http://localhost:2323/api/categories/${categoryId}/topics/${topicId}`);
+            const response = await axios.delete(`http://193.242.208.20:4000/api/categories/${categoryId}/topics/${topicId}`);
             setCategories(categories.map((item) => item._id === categoryId ? response.data : item));
         } catch (err) {
             console.error('خطا در حذف تاپیک:', err);
