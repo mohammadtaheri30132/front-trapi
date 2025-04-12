@@ -1,5 +1,5 @@
 'use client'
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { TextField, Button, Container, Typography, Paper, Box, MenuItem, Select, InputLabel, FormControl, IconButton, Chip } from '@mui/material';
 import SaveIcon from '@mui/icons-material/Save';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
@@ -52,63 +52,100 @@ const EditBookPage = () => {
         };
         fetchBook();
     }, [slug]);
-    const handleCopy=()=>{
-        const matin =`
+
+
+    const useCopyHandler = (book) => {
+        const handleCopy = useCallback(() => {
+          const matin = `
             موارد قبلی را در نظر نگیر و فراموش کن
             تو مترجم کتاب هستی
-
+      
             مواردی که گفتم را انجام بده و رعایت کن
-
+      
             تمام مواردی که گفتم در پایین را ترجمه کن به فارسی
             و با لحن محاوره ای و دوستانه
             
             اگر جایی از متن به خرید از امازون اشاره داشت ان را حذف کن
             بازم هم تاکیر میکنم پس از ترجمه لحن ترجمه فارسی باید محاوره ای باشه
             و نام کتاب ترجمه شده باشه
-
+      
              و یک بیو گرافی از نویسنده یا نویسندگان بده در پایان بگو نویسنده کتاب چه کسی یا چه کسانی است 
             (به دو شکل انگلیسی و فارسی نام هایش را بنویس)
             همچنین نام کتاب را بهترین معادل فارسی ان در نظر بگیر
-        نام کتاب :
-        ${book.name}
-        ---------------- 
-        توضیحات کوتاه:
-        ${book.short_desc}
-        ----------------
-        توضیحات کتاب :
-        ${book.desc_book}
-        ----------------
-        درباره کتاب :
-        ${book.about_the_book}
-        ----------------
-        برسی کتاب :
-        ${book.book_review}
-        ----------------
-        چه کسانی این کتاب را میخوانند:
-        ${book.who_should_read}
-        ---------------
-       
-        در نهایت یک ابجکت جاوااسکریپت به نام info قابل کپی به من بده
-        که 
-
-        باز هم تاکید میکنم
-        در خروجی فقط فایل جاوااسکریپت برایم و نویسندگان کتاب(نام نویسندگان و بیوگرافی انها  را بعد از فایل جاوااسکریپت به صورت متن بگو) مهم است بقیه توضیحات اضافی را نده
-
-        const name ='ترجمه نام کتاب '
-        const short_desc ='ترجمه توضیحات کوتاه '
-        const desc_book ='ترجمه توضیحات کتاب '
-        const about_the_book ='ترجمه نام کتاب '
-        const book_review ='ترجمه برسی کتاب '
-        const who_should_read ='ترجمه چه کسانی این کتاب را میخوانند'
-
-
-        `
-        navigator.clipboard.writeText(matin).then(() => {
-            alert('متن با موفقیت کپی شد!');
-          }).catch((err) => {
+          نام کتاب :
+          ${book?.name || 'نام کتاب مشخص نشده'}
+          ---------------- 
+          توضیحات کوتاه:
+          ${book?.short_desc || 'توضیحات کوتاه مشخص نشده'}
+          ----------------
+          توضیحات کتاب :
+          ${book?.desc_book || 'توضیحات کتاب مشخص نشده'}
+          ----------------
+          درباره کتاب :
+          ${book?.about_the_book || 'درباره کتاب مشخص نشده'}
+          ----------------
+          برسی کتاب :
+          ${book?.book_review || 'بررسی کتاب مشخص نشده'}
+          ----------------
+          چه کسانی این کتاب را میخوانند:
+          ${book?.who_should_read || 'مشخص نشده'}
+          ---------------
+         
+          در نهایت یک ابجکت جاوااسکریپت به نام info قابل کپی به من بده
+          که 
+      
+          باز هم تاکید میکنم
+          در خروجی فقط فایل جاوااسکریپت برایم و نویسندگان کتاب(نام نویسندگان و بیوگرافی انها  را بعد از فایل جاوااسکریپت به صورت متن بگو) مهم است بقیه توضیحات اضافی را نده
+      
+          const name ='ترجمه نام کتاب '
+          const short_desc ='ترجمه توضیحات کوتاه '
+          const desc_book ='ترجمه توضیحات کتاب '
+          const about_the_book ='ترجمه نام کتاب '
+          const book_review ='ترجمه برسی کتاب '
+          const who_should_read ='ترجمه چه کسانی این کتاب را میخوانند'
+          `;
+      
+          // Ensure this runs only in the browser
+          if (typeof window !== 'undefined') {
+            // Modern clipboard API
+            if (navigator.clipboard && navigator.clipboard.writeText) {
+              navigator.clipboard
+                .writeText(matin)
+                .then(() => {
+                  alert('متن با موفقیت کپی شد!');
+                })
+                .catch((err) => {
+                  console.error('خطا در کپی با clipboard API: ', err);
+                  // Fallback to execCommand
+                  fallbackCopy(matin);
+                });
+            } else {
+              // Fallback for older browsers
+              fallbackCopy(matin);
+            }
+          } else {
+            console.log('محیط سرور: کپی کردن در دسترس نیست. متن:');
+            console.log(matin);
+          }
+        }, [book]);
+      
+        // Fallback copy method using textarea and execCommand
+        const fallbackCopy = (text) => {
+          try {
+            const textarea = document.createElement('textarea');
+            textarea.value = text;
+            document.body.appendChild(textarea);
+            textarea.select();
+            document.execCommand('copy');
+            document.body.removeChild(textarea);
+            alert('متن با موفقیت کپی شد (روش جایگزین)!');
+          } catch (err) {
             alert('خطا در کپی کردن متن: ' + err);
-          });
-    }
+          }
+        };
+      
+        return handleCopy;
+      };
     useEffect(() => {
         const fetchData = async () => {
             const [categoriesRes, topicsRes, authorsRes] = await Promise.all([
@@ -213,62 +250,100 @@ const EditBookPage = () => {
 
     // document.body.removeChild(a);
     // `
-    function generateCodeWithSlug() {
-        // استرینگ کد اصلی که می‌خواهیم slug در آن قرار گیرد
-        const codeTemplate = `
-        const targetLink = document.querySelector('a[href="/app/books/${book.slug}"]');
-        const p = targetLink.parentElement;
-    
-        const pages = [...p.children].filter(item => {
-            if (item.tagName === 'DIV') {
-                const testText = item.innerText;
-                return testText;
-            }
-        });
-    
-        const texts = pages.map((item) => {
-            const line = item.innerText;
-            const firstNewline = line.indexOf('\\n'); // اولین \n
-            const secondNewline = line.indexOf('\\n', firstNewline + 1); // دومین \n
-            const thirdNewline = line.indexOf('\\n', secondNewline + 1); // سومین \n
-    
-            const title = line.substring(secondNewline + 1, thirdNewline).trim();
-            const text = line.substring(thirdNewline + 1).trim();
-    
-            return {
-                title: title,
-                text: text
-            };
-        });
-       const headerText = " میخواهم تایتل و متن هر کدام از ابجکت های زیر را برایم به فارسی ترجمه کنی و لحن ان باید محاوره ای باشد جتی اسم کتاب ها و نویسنده نیز باید فارسی یا معادل فارسی اند باشد همچنین هر جایی نیاز بود متن به خط بعدی برود بنویس ENTERBEZAN . در اخر یک فایل جاوا اسکریپت بده که یک ارایه به نام books مانند ارایه .توجه داشته باش من در خروجی فقط فایل جاوااسکریپت میخواهم.";
-
-        const backslashn='   = '
-        const jsonContent  = JSON.stringify(texts, null, 2);
-        const finalContent = headerText +  jsonContent;
-    
-        const blob = new Blob([finalContent], { type: 'text/plain' });
-        const url = URL.createObjectURL(blob);
-        const a = document.createElement('a');
-        a.href = url;
-        a.download = 'texts.txt'; // نام فایل برای دانلود
-        document.body.appendChild(a);
-        a.click();
-        document.body.removeChild(a);
-        `;
-    
-        // کپی کردن کد به کلیپ‌بورد
-        navigator.clipboard.writeText(codeTemplate)
-            .then(() => {
-                alert("بزن بریم به صفحه کتاب");
-                window.open(`http://blinkist.com/en/reader/books/${book.slug}`, '_blank')
-            })
-            .catch((err) => {
-                console.error("خطا در کپی به کلیپ‌بورد:", err);
-                alert("خطا در کپی کردن کد.");
+    const useGenerateCodeWithSlug = (book) => {
+        const generateCodeWithSlug = useCallback(() => {
+          // Validate book and slug
+          if (!book || !book.slug) {
+            alert('کتاب یا slug مشخص نشده!');
+            return;
+          }
+      
+          const codeTemplate = `
+            const targetLink = document.querySelector('a[href="/app/books/${book.slug}"]');
+            const p = targetLink?.parentElement;
+        
+            const pages = [...(p?.children || [])].filter(item => {
+                if (item.tagName === 'DIV') {
+                    const testText = item.innerText;
+                    return testText;
+                }
             });
-    }
-    
-    
+        
+            const texts = pages.map((item) => {
+                const line = item.innerText;
+                const firstNewline = line.indexOf('\\n'); // اولین \\n
+                const secondNewline = line.indexOf('\\n', firstNewline + 1); // دومین \\n
+                const thirdNewline = line.indexOf('\\n', secondNewline + 1); // سومین \\n
+        
+                const title = line.substring(secondNewline + 1, thirdNewline).trim();
+                const text = line.substring(thirdNewline + 1).trim();
+        
+                return {
+                    title: title,
+                    text: text
+                };
+            });
+            const headerText = " میخواهم تایتل و متن هر کدام از ابجکت های زیر را برایم به فارسی ترجمه کنی و لحن ان باید محاوره ای باشد حتی اسم کتاب ها و نویسنده نیز باید فارسی یا معادل فارسی اند باشد همچنین هر جایی نیاز بود متن به خط بعدی برود بنویس ENTERBEZAN . در اخر یک فایل جاوا اسکریپت بده که یک ارایه به نام books مانند ارایه .توجه داشته باش من در خروجی فقط فایل جاوااسکریپت میخواهم.";
+      
+            const backslashn = '   = ';
+            const jsonContent = JSON.stringify(texts, null, 2);
+            const finalContent = headerText + jsonContent;
+        
+            const blob = new Blob([finalContent], { type: 'text/plain' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'texts.txt'; // نام فایل برای دانلود
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+          `;
+      
+          // Run only in browser
+          if (typeof window !== 'undefined') {
+            // Try modern clipboard API
+            if (navigator.clipboard && navigator.clipboard.writeText) {
+              navigator.clipboard
+                .writeText(codeTemplate)
+                .then(() => {
+                  alert('بزن بریم به صفحه کتاب');
+                  window.open(`http://blinkist.com/en/reader/books/${book.slug}`, '_blank');
+                })
+                .catch((err) => {
+                  console.error('خطا در کپی با clipboard API: ', err);
+                  // Fallback copy
+                  fallbackCopy(codeTemplate, book.slug);
+                });
+            } else {
+              // Fallback for older browsers
+              fallbackCopy(codeTemplate, book.slug);
+            }
+          } else {
+            console.log('محیط سرور: کپی کردن در دسترس نیست. کد:');
+            console.log(codeTemplate);
+          }
+        }, [book]);
+      
+        // Fallback copy method
+        const fallbackCopy = (text, slug) => {
+          try {
+            const textarea = document.createElement('textarea');
+            textarea.value = text;
+            document.body.appendChild(textarea);
+            textarea.select();
+            document.execCommand('copy');
+            document.body.removeChild(textarea);
+            alert('کد با موفقیت کپی شد (روش جایگزین)!');
+            window.open(`http://blinkist.com/en/reader/books/${slug}`, '_blank');
+          } catch (err) {
+            alert('خطا در کپی کردن کد: ' + err);
+          }
+        };
+      
+        return generateCodeWithSlug;
+      };
+    const handleCopy = useCopyHandler(book);
+    const generateCodeWithSlug = useGenerateCodeWithSlug(book);
     return (
         <Container maxWidth="md" sx={{ padding: '20px' }}>
             <Typography variant="h4">ویرایش کتاب</Typography>
